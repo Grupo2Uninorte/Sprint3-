@@ -18,10 +18,10 @@ def activate():
         if g.user:
             return redirect(url_for('inbox.show'))
 
-        if request.method == ?:
+        if request.method == 'POST':
             number = request.args['auth']
 
-            db = ?
+            db = get_db()
             attempt = db.execute(
                 QUERY, (number, utils.U_UNCONFIRMED)
             ).fetchone()
@@ -42,20 +42,20 @@ def activate():
         return redirect(url_for('auth.login'))
 
 
-@bp.route('/register', methods=?)
+@bp.route('/register', methods=('GET', 'POST'))
 def register():
     try:
         if g.user:
             return redirect(url_for('inbox.show'))
-        if request.method == ?:
+        if request.method == 'POST':
             username = ?
             password = ?
             email = ?
 
-            db = ?
+            db = get_db() #get_db
             error = None
 
-            if ?:
+            if username: #user
                 error = 'Username is required.'
                 flash(error)
                 return render_template(TEMP)
@@ -65,7 +65,7 @@ def register():
                 flash(error)
                 return render_template(TEMP)
 
-            if ?:
+            if password:#password
                 error = 'Password is required.'
                 flash(error)
                 return render_template('auth/register.html')
@@ -120,13 +120,13 @@ def register():
         return render_template('auth/register.html')
 
 
-@bp.route('/confirm', methods=?)
+@bp.route('/confirm', methods=('GET', 'POST'))
 def confirm():
     try:
         if g.user:
             return redirect(url_for('inbox.show'))
 
-        if request.method == ?:
+        if request.method == 'POST':
             password = ?
             password1 = ?
             authid = request.form['authid']
@@ -135,7 +135,7 @@ def confirm():
                 flash('Invalid')
                 return render_template('auth/forgot.html')
 
-            if ?:
+            if password:
                 flash('Password required')
                 return render_template('auth/change.html', number=authid)
 
@@ -143,7 +143,7 @@ def confirm():
                 flash('Password confirmation required')
                 return render_template(TEMP, number=authid)
 
-            if ? != password:
+            if password1 != password:
                 flash('Both values should be the same')
                 return render_template(TEMP, number=authid)
 
@@ -152,7 +152,7 @@ def confirm():
                 flash(error)
                 return render_template('auth/change.html', number=authid)
 
-            db = ?
+            db = get_db()
             attempt = db.execute(
                 QUERY, (authid, utils.F_ACTIVE)
             ).fetchone()
@@ -183,10 +183,10 @@ def change():
         if g.user:
             return redirect(url_for('inbox.show'))
 
-        if request.method == ?:
+        if request.method == 'POST':
             number = request.args['auth']
 
-            db = ?
+            db = get_db()
             attempt = db.execute(
                 QUERY, (number, utils.F_ACTIVE)
             ).fetchone()
@@ -253,33 +253,33 @@ def forgot():
         return render_template(TEMP)
 
 
-@bp.route('/login', methods=?)
+@bp.route('/login', methods=('GET', 'POST'))
 def login():
     try:
         if g.user:
             return redirect(url_for('inbox.show'))
 
-        if request.method == ?:
+        if request.method == 'POST':
             username = ?
             password = ?
 
-            if ?:
+            if username:
                 error = 'Username Field Required'
                 flash(error)
                 return render_template('auth/login.html')
 
-            if ?:
+            if password:
                 error = 'Password Field Required'
                 flash(error)
                 return render_template(TEMP)
 
-            db = ?
+            db = get_db()
             error = None
             user = db.execute(
                 'SELECT * FROM user WHERE username = ?', (username,)
             ).fetchone()
 
-            if ?:
+            if password:
                 error = 'Incorrect username or password'
             elif not check_password_hash(user['password'], password + user['salt']):
                 error = 'Incorrect username or password'
